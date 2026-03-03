@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kacper Kosiński | CTRL-F-0rg3</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #09090b;
+            --bg-secondary: #0f0f12;
+            --bg-card: #15151a;
+            --gold-dark: #8B4513;
+            --gold-primary: #A36A18;
+            --gold-bright: #CD7F32;
+            --gold-light: #D2691E;
+            --gold-dim: #704214;
+            --text-primary: #e8e4dc;
+            --text-secondary: #9a9590;
+            --accent: #B87333;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Dark rune pattern overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(163, 106, 24, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(139, 69, 19, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(205, 127, 50, 0.02) 0%, transparent 40%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Language Switcher */
+        .lang-switch {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+            background: rgba(15, 15, 18, 0.9);
+            padding: 10px 15px;
+            border-radius: 30px;
+            border: 1px solid var(--gold-dim);
+            backdrop-filter: blur(10px);
+        }
+
+        .lang-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.3rem;
+            opacity: 0.4;
+            transition: all 0.3s;
+            padding: 5px;
+            filter: grayscale(100%);
+        }
+
+        .lang-btn.active {
+            opacity: 1;
+            filter: grayscale(0%);
+            transform: scale(1.1);
+        }
+
+        .lang-btn:hover {
+            opacity: 0.8;
+            transform: scale(1.05);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+            background: 
+                radial-gradient(ellipse at center, rgba(163, 106, 24, 0.08) 0%, transparent 60%),
+                radial-gradient(circle at 50% 100%, rgba(139, 69, 19, 0.1) 0%, transparent 50%);
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            background: linear-gradient(to top, var(--bg-primary), transparent);
+        }
+
+        .avatar-container {
+            position: relative;
+            margin-bottom: 3rem;
+            z-index: 1;
+        }
+
+        .avatar {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            border: 3px solid var(--gold-primary);
+            object-fit: cover;
+            box-shadow: 
+                0 0 0 4px var(--bg-primary),
+                0 0 0 6px var(--gold-dim),
+                0 0 40px rgba(163, 106, 24, 0.3),
+                inset 0 0 30px rgba(0,0,0,0.5);
+            position: relative;
+            z-index: 2;
+            filter: sepia(20%) contrast(1.1);
+        }
+
+        .avatar-ring {
+            position: absolute;
+            top: -12px;
+            left: -12px;
+            right: -12px;
+            bottom: -12px;
+            border: 2px solid transparent;
+            border-top-color: var(--gold-primary);
+            border-right-color: var(--gold-bright);
+            border-radius: 50%;
+            animation: spin 20s linear infinite;
+            opacity: 0.6;
+        }
+
+        .avatar-ring:nth-child(2) {
+            top: -20px;
+            left: -20px;
+            right: -20px;
+            bottom: -20px;
+            border-top-color: var(--gold-dim);
+            border-left-color: var(--gold-primary);
+            animation: spin 30s linear infinite reverse;
+            opacity: 0.4;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        h1 {
+            font-size: 3.2rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(180deg, var(--gold-bright) 0%, var(--gold-primary) 50%, var(--gold-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 2px 10px rgba(163, 106, 24, 0.2);
+            letter-spacing: 2px;
+            font-weight: 700;
+            z-index: 1;
+            text-transform: uppercase;
+        }
+
+        .nickname {
+            font-size: 1.4rem;
+            color: var(--gold-bright);
+            font-family: 'Courier New', monospace;
+            margin-bottom: 2rem;
+            letter-spacing: 3px;
+            text-shadow: 0 0 20px rgba(205, 127, 50, 0.3);
+            z-index: 1;
+            opacity: 0.9;
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            line-height: 1.8;
+            z-index: 1;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 40px;
+            animation: bounce 2s infinite;
+            color: var(--gold-dim);
+            font-size: 1.8rem;
+            z-index: 1;
+            opacity: 0.6;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        /* Sections */
+        section {
+            padding: 6rem 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        h2 {
+            font-size: 2.2rem;
+            margin-bottom: 2.5rem;
+            color: var(--gold-bright);
+            display: inline-block;
+            position: relative;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: 600;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--gold-primary), var(--gold-dark), transparent);
+        }
+
+        /* About */
+        .about-content {
+            background: linear-gradient(135deg, rgba(21, 21, 26, 0.8), rgba(15, 15, 18, 0.9));
+            padding: 2.5rem;
+            border-radius: 4px;
+            border: 1px solid rgba(163, 106, 24, 0.2);
+            font-size: 1.1rem;
+            line-height: 1.9;
+            box-shadow: 
+                0 4px 20px rgba(0,0,0,0.5),
+                inset 0 1px 0 rgba(255,255,255,0.02);
+            position: relative;
+        }
+
+        .about-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gold-primary), var(--gold-dark));
+        }
+
+        .about-content p {
+            margin-bottom: 1.3rem;
+        }
+
+        .highlight {
+            color: var(--gold-bright);
+            font-weight: 500;
+            text-shadow: 0 0 10px rgba(205, 127, 50, 0.2);
+        }
+
+        /* Projects */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .project-card {
+            background: linear-gradient(145deg, rgba(21, 21, 26, 0.9), rgba(15, 15, 18, 0.95));
+            border: 1px solid rgba(163, 106, 24, 0.15);
+            border-radius: 4px;
+            padding: 2rem;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-primary), var(--gold-bright), var(--gold-dark));
+            box-shadow: 0 0 10px rgba(163, 106, 24, 0.3);
+        }
+
+        .project-card:hover {
+            border-color: rgba(163, 106, 24, 0.4);
+            box-shadow: 
+                0 8px 30px rgba(0,0,0,0.4),
+                0 0 20px rgba(163, 106, 24, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .project-card h3 {
+            color: var(--gold-bright);
+            font-size: 1.5rem;
+            margin-bottom: 0.8rem;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .project-card .tech {
+            color: var(--gold-primary);
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            margin-bottom: 1.2rem;
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background: rgba(163, 106, 24, 0.1);
+            border: 1px solid rgba(163, 106, 24, 0.2);
+            border-radius: 3px;
+            letter-spacing: 0.5px;
+        }
+
+        .project-card p {
+            color: var(--text-secondary);
+            margin-bottom: 1.8rem;
+            line-height: 1.7;
+        }
+
+        .project-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--gold-bright);
+            text-decoration: none;
+            border: 1px solid var(--gold-dim);
+            padding: 0.6rem 1.2rem;
+            border-radius: 3px;
+            transition: all 0.3s;
+            font-weight: 500;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .project-link:hover {
+            background: rgba(163, 106, 24, 0.15);
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 15px rgba(163, 106, 24, 0.2);
+        }
+
+        /* Skills */
+        .skills-container {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .skill-item {
+            background: linear-gradient(90deg, rgba(21, 21, 26, 0.9), rgba(15, 15, 18, 0.8));
+            padding: 1.5rem;
+            border-radius: 4px;
+            border: 1px solid rgba(163, 106, 24, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .skill-item:hover {
+            border-color: rgba(163, 106, 24, 0.3);
+            background: linear-gradient(90deg, rgba(21, 21, 26, 0.95), rgba(15, 15, 18, 0.9));
+        }
+
+        .skill-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, var(--gold-primary), var(--gold-dark));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .skill-item:hover::before {
+            opacity: 1;
+        }
+
+        .skill-name {
+            font-size: 1.2rem;
+            color: var(--gold-bright);
+            font-family: 'Courier New', monospace;
+            min-width: 120px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .skill-level {
+            display: flex;
+            gap: 6px;
+        }
+
+        .star {
+            color: var(--gold-primary);
+            font-size: 1.1rem;
+            text-shadow: 0 0 5px rgba(163, 106, 24, 0.3);
+        }
+
+        .star.empty {
+            color: rgba(255, 255, 255, 0.08);
+            text-shadow: none;
+        }
+
+        .skill-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            flex-basis: 100%;
+            margin-top: 0.5rem;
+            padding-left: 1rem;
+            border-left: 2px solid rgba(163, 106, 24, 0.2);
+        }
+
+        /* Coffee Section - Updated with creative messaging */
+        .coffee-section {
+            text-align: center;
+            background: linear-gradient(135deg, rgba(21, 21, 26, 0.9), rgba(15, 15, 18, 0.95));
+            border-radius: 4px;
+            padding: 3.5rem 2.5rem;
+            border: 1px solid rgba(163, 106, 24, 0.2);
+            box-shadow: 
+                0 4px 30px rgba(0,0,0,0.4),
+                inset 0 0 60px rgba(163, 106, 24, 0.02);
+            position: relative;
+        }
+
+        .coffee-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--gold-primary), var(--gold-bright), var(--gold-primary), transparent);
+        }
+
+        .coffee-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        .coffee-section h2 {
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+        }
+
+        .coffee-section h2::after {
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+        }
+
+        .coffee-subtitle {
+            color: var(--gold-bright);
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            letter-spacing: 1px;
+        }
+
+        .coffee-section p {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+
+        .coffee-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 1rem;
+            background: linear-gradient(180deg, var(--gold-primary), var(--gold-dark));
+            color: var(--bg-primary);
+            text-decoration: none;
+            padding: 1rem 2.5rem;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            border: 2px solid var(--gold-bright);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 4px 15px rgba(163, 106, 24, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .coffee-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .coffee-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 
+                0 8px 25px rgba(163, 106, 24, 0.4),
+                0 0 40px rgba(163, 106, 24, 0.2);
+            background: linear-gradient(180deg, var(--gold-bright), var(--gold-primary));
+        }
+
+        .coffee-btn:hover::before {
+            left: 100%;
+        }
+
+        .coffee-btn span:first-child {
+            font-size: 1.3rem;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-secondary);
+            border-top: 1px solid rgba(163, 106, 24, 0.1);
+            margin-top: 4rem;
+            background: linear-gradient(to top, rgba(15, 15, 18, 0.5), transparent);
+        }
+
+        footer p {
+            margin: 0.5rem 0;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+
+        /* Language content */
+        .lang-content {
+            display: none;
+        }
+
+        .lang-content.active {
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 { font-size: 2.2rem; letter-spacing: 1px; }
+            h2 { font-size: 1.8rem; }
+            .projects-grid { grid-template-columns: 1fr; }
+            .hero { padding: 1rem; }
+            section { padding: 4rem 1.5rem; }
+            .avatar { width: 150px; height: 150px; }
+            .coffee-btn { padding: 0.9rem 1.8rem; font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Language Switcher -->
+    <div class="lang-switch">
+        <button class="lang-btn active" onclick="switchLang('en')" title="English">🇬🇧</button>
+        <button class="lang-btn" onclick="switchLang('pl')" title="Polski">🇵🇱</button>
+    </div>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="avatar-container">
+            <div class="avatar-ring"></div>
+            <div class="avatar-ring"></div>
+            <img src="avatar.jpg" alt="Kacper Kosiński" class="avatar" onerror="this.src='https://via.placeholder.com/180/15151a/A36A18?text=KK'">
+        </div>
+        <h1>Kacper Kosiński</h1>
+        <div class="nickname">CTRL-F-0rg3</div>
+        <div class="tagline lang-content active" data-lang="en">
+            Low-level programmer, OS developer, and hardware whisperer.<br>
+            Building <span class="highlight">Cosinus OS</span> one interrupt at a time.
+        </div>
+        <div class="tagline lang-content" data-lang="pl">
+            Programista niskopoziomowy, deweloper OS i szepczący do sprzętu.<br>
+            Buduję <span class="highlight">Cosinus OS</span> jedno przerwanie na raz.
+        </div>
+        <div class="scroll-hint">▼</div>
+    </section>
+
+    <!-- About -->
+    <section id="about">
+        <h2 class="lang-content active" data-lang="en">About Me</h2>
+        <h2 class="lang-content" data-lang="pl">O Mnie</h2>
+        
+        <div class="about-content lang-content active" data-lang="en">
+            <p>
+                I'm a <span class="highlight">low-level programmer</span> obsessed with the bare metal. While others fear the segfault, I embrace it. My playground is <span class="highlight">x86_64 architecture</span>, where I speak fluent Assembly and Rust - because someone has to talk to the hardware directly.
+            </p>
+            <p>
+                Currently, I'm developing <span class="highlight">Cosinus OS</span> (yes, it's the successor to Sinus OS - I like my math functions and my operating systems with proper continuity). It's a journey of pain, debugging, and occasional moments of pure euphoria when the kernel actually boots.
+            </p>
+            <p>
+                When I'm not fighting with memory allocators or writing device drivers, you'll find me <span class="highlight">drawing</span> or strumming my <span class="highlight">guitar</span>. Because even low-level programmers need high-level creativity sometimes.
+            </p>
+            <p>
+                I take my code seriously, but myself? Not so much. Professional enough to ship, humble enough to know there's always more to learn.
+            </p>
+        </div>
+
+        <div class="about-content lang-content" data-lang="pl">
+            <p>
+                Jestem <span class="highlight">programistą niskopoziomowym</span> obsesyjnym dotykającym gołego metalu. Podczas gdy inni boją się segfaultów, ja je przytulam. Moim placem zabaw jest <span class="highlight">architektura x86_64</span>, gdzie mówię biegle w Assembly i Rust - bo ktoś musi rozmawiać ze sprzętem bezpośrednio.
+            </p>
+            <p>
+                Obecnie rozwijam <span class="highlight">Cosinus OS</span> (tak, to następca Sinus OS - lubię swoje funkcje matematyczne i systemy operacyjne z właściwą ciągłością). To podróż pełna bólu, debugowania i okazjonalnych momentów czystej euforii, gdy kernel w końcu się bootuje.
+            </p>
+            <p>
+                Gdy nie walczę z alokatorami pamięci czy nie piszę sterowników urządzeń, znajdziesz mnie przy <span class="highlight">rysowaniu</span> lub przy <span class="highlight">gitarze</span>. Bo nawet programiści niskopoziomowi potrzebują czasem kreatywności wysokopoziomowej.
+            </p>
+            <p>
+                Traktuję swój kod poważnie, ale siebie? Nie bardzo. Na tyle profesjonalny by dostarczać, na tyle pokorny by wiedzieć, że zawsze jest więcej do nauki.
+            </p>
+        </div>
+    </section>
+
+    <!-- Projects -->
+    <section id="projects">
+        <h2 class="lang-content active" data-lang="en">Active Projects</h2>
+        <h2 class="lang-content" data-lang="pl">Aktywne Projekty</h2>
+
+        <div class="projects-grid">
+            <!-- Cosinus OS -->
+            <div class="project-card">
+                <h3>Cosinus OS</h3>
+                <div class="tech">Rust | x86_64 | Assembly</div>
+                <p class="lang-content active" data-lang="en">
+                    My main brainchild - a hobby operating system written from scratch. Because the world needed another OS, obviously. Currently implementing memory management and process scheduling with a custom kernel.
+                </p>
+                <p class="lang-content" data-lang="pl">
+                    Moje główne dziecko - system operacyjny hobby pisany od zera. Bo świat potrzebował kolejnego OS, oczywiście. Obecnie implementuję zarządzanie pamięcią i schedulowanie procesów z własnym kernelem.
+                </p>
+                <a href="https://github.com/CTRL-F-0rg3/CosinusOS" class="project-link" target="_blank">
+                    <span>View Project</span>
+                    <span>→</span>
+                </a>
+            </div>
+
+            <!-- vccat Browser -->
+            <div class="project-card">
+                <h3>vccat Browser</h3>
+                <div class="tech">Rust | Minimalist | Cosinus OS Ecosystem</div>
+                <p class="lang-content active" data-lang="en">
+                    A minimal browser written in Rust for the Cosinus OS ecosystem. No bloat, no tracking, just pure browsing. Because modern browsers forgot what "lightweight" means. Currently in active development.
+                </p>
+                <p class="lang-content" data-lang="pl">
+                    Minimalistyczna przeglądarka napisana w Rust dla ekosystemu Cosinus OS. Bez bloatu, bez śledzenia, czyste przeglądanie. Bo nowoczesne przeglądarki zapomniały co znaczy "lekkie". Obecnie w aktywnym rozwoju.
+                </p>
+                <a href="https://github.com/Cosinus-OS-Organization/vccat-Browser" class="project-link" target="_blank">
+                    <span>View Project</span>
+                    <span>→</span>
+                </a>
+            </div>
+
+            <!-- Brass Engine -->
+            <div class="project-card">
+                <h3>Brass Engine</h3>
+                <div class="tech">Rust | 3D Graphics | Game Engine</div>
+                <p class="lang-content active" data-lang="en">
+                    A 3D Game Engine written in Rust. Currently in early development, because I apparently don't have enough projects. Will probably render a triangle soon™. Designed for performance and low-level control.
+                </p>
+                <p class="lang-content" data-lang="pl">
+                    Silnik 3D Game Engine napisany w Rust. Obecnie we wczesnym rozwoju, bo najwyraźniej nie mam wystarczająco projektów. Prawdopodobnie wkrótce™ wyrenderuje trójkąt. Zaprojektowany dla wydajności i kontroli niskopoziomowej.
+                </p>
+                <span class="project-link" style="opacity: 0.5; cursor: not-allowed;">
+                    <span>Coming Soon</span>
+                </span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills -->
+    <section id="skills">
+        <h2 class="lang-content active" data-lang="en">Languages & Expertise</h2>
+        <h2 class="lang-content" data-lang="pl">Języki i Umiejętności</h2>
+
+        <div class="skills-container">
+            <div class="skill-item">
+                <span class="skill-name">Rust</span>
+                <div class="skill-level">
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                </div>
+                <span class="skill-desc lang-content active" data-lang="en">Daily driver for OS development, my weapon of choice for systems programming</span>
+                <span class="skill-desc lang-content" data-lang="pl">Główne narzędzie do dev OS, mój wybór numer jeden do programowania systemowego</span>
+            </div>
+
+            <div class="skill-item">
+                <span class="skill-name">ASM (x86_64)</span>
+                <div class="skill-level">
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star empty">★</span>
+                </div>
+                <span class="skill-desc lang-content active" data-lang="en">Fluent in speaking to hardware directly, bootloader and kernel internals</span>
+                <span class="skill-desc lang-content" data-lang="pl">Biegły w rozmawianiu ze sprzętem bezpośrednio, bootloadery i wewnętrzne kernele</span>
+            </div>
+
+            <div class="skill-item">
+                <span class="skill-name">C</span>
+                <div class="skill-level">
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star empty">★</span>
+                </div>
+                <span class="skill-desc lang-content active" data-lang="en">The classics never die, still use for low-level work and legacy systems</span>
+                <span class="skill-desc lang-content" data-lang="pl">Klasyka nigdy nie umiera, nadal używam do niskopoziomowych rzeczy i systemów legacy</span>
+            </div>
+
+            <div class="skill-item">
+                <span class="skill-name">C++</span>
+                <div class="skill-level">
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star empty">★</span>
+                    <span class="star empty">★</span>
+                </div>
+                <span class="skill-desc lang-content active" data-lang="en">Good knowledge, but prefer Rust for new projects to avoid the footguns</span>
+                <span class="skill-desc lang-content" data-lang="pl">Dobra znajomość, ale wolę Rust do nowych projektów by unikać strzałów w stopę</span>
+            </div>
+
+            <div class="skill-item">
+                <span class="skill-name">C#</span>
+                <div class="skill-level">
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star empty">★</span>
+                    <span class="star empty">★</span>
+                </div>
+                <span class="skill-desc lang-content active" data-lang="en">Used for higher-level tools, utilities and when I need GUI quickly</span>
+                <span class="skill-desc lang-content" data-lang="pl">Używany do narzędzi wyższego poziomu, utilitek i gdy potrzebuję GUI szybko</span>
+            </div>
+
+            <div class="skill-item">
+                <span class="skill-name">Python</span>
+                <div class="skill-level">
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star empty">★</span>
+                    <span class="star empty">★</span>
+                </div>
+                <span class="skill-desc lang-content active" data-lang="en">For scripting, automation, build systems and when I need things done yesterday</span>
+                <span class="skill-desc lang-content" data-lang="pl">Do skryptów, automatyzacji, systemów buildowych i gdy potrzebuję wyników na wczoraj</span>
+            </div>
+
+            <div class="skill-item">
+                <span class="skill-name">JavaScript</span>
+                <div class="skill-level">
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star empty">★</span>
+                    <span class="star empty">★</span>
+                    <span class="star empty">★</span>
+                </div>
+                <span class="skill-desc lang-content active" data-lang="en">Enough to make this website and basic frontend stuff, not my favorite</span>
+                <span class="skill-desc lang-content" data-lang="pl">Wystarczająco by zrobić tę stronę i podstawowy frontend, nie mój ulubiony</span>
+            </div>
+
+            <div class="skill-item">
+                <span class="skill-name">Java</span>
+                <div class="skill-level">
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star empty">★</span>
+                    <span class="star empty">★</span>
+                </div>
+                <span class="skill-desc lang-content active" data-lang="en">Solid basics, can work with it but prefer native languages for performance</span>
+                <span class="skill-desc lang-content" data-lang="pl">Solidne podstawy, mogę z tym pracować ale wolę języki natywne dla wydajności</span>
+            </div>
+
+            <div class="skill-item">
+                <span class="skill-name">Nim</span>
+                <div class="skill-level">
+                    <span class="star">★</span>
+                    <span class="star empty">★</span>
+                    <span class="star empty">★</span>
+                    <span class="star empty">★</span>
+                    <span class="star empty">★</span>
+                </div>
+                <span class="skill-desc lang-content active" data-lang="en">Learning in progress, interesting syntax and compiles to C</span>
+                <span class="skill-desc lang-content" data-lang="pl">W trakcie nauki, interesująca składnia i kompiluje się do C</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Buy Me a Coffee Section -->
+    <section id="coffee">
+        <div class="coffee-section">
+            <span class="coffee-icon">☕</span>
+            
+            <h2 class="lang-content active" data-lang="en">Fuel My Code</h2>
+            <h2 class="lang-content" data-lang="pl">Paliwo dla Kodu</h2>
+            
+            <div class="coffee-subtitle lang-content active" data-lang="en">// Buy me a coffee</div>
+            <div class="coffee-subtitle lang-content" data-lang="pl">// Postaw mi kawę</div>
+            
+            <p class="lang-content active" data-lang="en">
+                Cosinus OS runs on caffeine and stubbornness.<br>
+                Your support keeps the interrupts flowing and the kernel compiling.<br>
+                Every coffee = one less segfault (probably).
+            </p>
+            <p class="lang-content" data-lang="pl">
+                Cosinus OS działa na kofeinie i upartości.<br>
+                Twoje wsparcie utrzymuje przerwania w ruchu i kernel w kompilacji.<br>
+                Każda kawa = jeden segfault mniej (prawdopodobnie).
+            </p>
+            
+            <a href="https://tipply.pl/@ctrlf0rge" class="coffee-btn" target="_blank">
+                <span>☕</span>
+                <span class="lang-content active" data-lang="en">Buy me a coffee</span>
+                <span class="lang-content" data-lang="pl">Postaw mi kawę</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2026 Kacper Kosiński | CTRL-F-0rg3</p>
+        <p style="margin-top: 0.5rem; opacity: 0.7;">
+            <span class="lang-content active" data-lang="en">Forged in the fires of low-level programming</span>
+            <span class="lang-content" data-lang="pl">Wykute w ogniu programowania niskopoziomowego</span>
+        </p>
+    </footer>
+
+    <script>
+        function switchLang(lang) {
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            document.querySelectorAll('.lang-content').forEach(el => {
+                el.classList.remove('active');
+                if (el.dataset.lang === lang) {
+                    el.classList.add('active');
+                }
+            });
+
+            document.documentElement.lang = lang;
+        }
+    </script>
+
+</body>
+</html>
